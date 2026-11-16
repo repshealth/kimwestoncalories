@@ -250,6 +250,16 @@
 #tnym-calc .tn-closing p { font-size: 15px; margin: 12px auto 22px; max-width: 46ch; opacity: 0.95; }
 #tnym-calc .tn-closing .tn-btn { background: var(--tn-white); color: var(--tn-rose); max-width: 360px; margin: 0 auto; box-shadow: none; }
 #tnym-calc .tn-closing .tn-btn:hover { background: #FBEFF1; }
+#tnym-calc .tn-book { margin-top: 22px; scroll-margin-top: 20px; }
+#tnym-calc .tn-book-sub { font-size: 14.5px; color: var(--tn-dim); margin: -6px 0 18px; }
+#tnym-calc .tn-book-frame { margin: 0 -12px; }
+#tnym-calc .tn-book-link {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 18px;
+  border: 1.5px solid var(--tn-rose); background: var(--tn-white); color: var(--tn-rose); border-radius: 10px;
+  padding: 14px 16px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .15s;
+}
+#tnym-calc .tn-book-link:hover { background: #FCF3F4; }
+#tnym-calc .tn-book-link svg { width: 16px; height: 16px; flex: 0 0 16px; }
 #tnym-calc .tn-reset { display: block; margin: 22px auto 0; border: 1px solid var(--tn-line); background: var(--tn-white); color: var(--tn-dim); border-radius: 10px; padding: 12px 26px; font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
 #tnym-calc .tn-reset:hover { color: var(--tn-rose); border-color: var(--tn-rose); }
 #tnym-calc .tn-disclaimer { font-size: 12px; color: var(--tn-dim); text-align: center; margin-top: 22px; line-height: 1.6; }
@@ -443,7 +453,7 @@
       <div class="tn-card tn-fade">
         <div class="tn-card-head" style="margin-bottom:10px">
           <span class="tn-pill">YOUR RESULTS</span>
-          <h2 class="tn-h2"><span data-r="name"></span>, here are your numbers</h2>
+          <h2 class="tn-h2">Thank you, <span data-r="name"></span>! Here are your numbers</h2>
         </div>
         <div class="tn-target">
           <p class="tn-target-label">Your daily calorie target</p>
@@ -469,6 +479,10 @@
           <div><b data-r="tdee">0</b><span>Maintenance</span></div>
           <div><b data-r="diff">0</b><span>Daily change</span></div>
         </div>
+
+        <button type="button" class="tn-book-link" data-to-booking>Want help hitting these? Book a 15-minute triage call
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M6 13l6 6 6-6"/></svg>
+        </button>
       </div>
 
       <div class="tn-gap"></div>
@@ -488,7 +502,13 @@
       <div class="tn-closing tn-fade">
         <h3 data-r="ctaTitle"></h3>
         <p data-r="ctaBody"></p>
-        <a class="tn-btn" data-r="ctaBtn" href="#" target="_top"></a>
+        <button type="button" class="tn-btn" data-r="ctaBtn" data-to-booking></button>
+      </div>
+
+      <div class="tn-card tn-book tn-fade" id="tn-booking">
+        <p class="tn-sec">Book your 15-minute triage call</p>
+        <p class="tn-book-sub">Pick a time that suits you below.</p>
+        <div class="tn-book-frame" data-booking></div>
       </div>
 
       <button type="button" class="tn-reset" data-reset>Start Again</button>
@@ -529,9 +549,11 @@
   var BRAND = {
     name: "The New You Movement",
     ctaTitle: "Want help hitting these numbers without giving up the foods you love?",
-    ctaBody: "Grab my free Smart Swaps Guide. Simple food trade-offs my clients use to save hundreds of calories a day, without restrictive diets.",
-    ctaLabel: "Send Me The Guide",
-    ctaUrl: "#",
+    ctaBody: "Book a 15-minute triage call. We'll go through your numbers together, talk about what's held you back so far, and work out your next step.",
+    ctaLabel: "Book a 15-Minute Triage Call",
+    /* GHL booking calendar shown at the bottom of the results */
+    bookingId: "W1A7K6sNOCa7RswuuKq5",
+    bookingUrl: "https://api.leadconnectorhq.com/widget/booking/W1A7K6sNOCa7RswuuKq5",
     disclaimer: "These numbers are an estimate based on the Mifflin-St Jeor equation and are a starting point, not medical advice. If you have a medical condition, are pregnant or breastfeeding, speak to your GP before changing your diet.",
     source: "New You Movement calorie calculator"
   };
@@ -853,6 +875,43 @@
 
   function fmt(n) { return Math.round(n).toLocaleString("en-GB"); }
 
+  /* GHL booking calendar, loaded when the results show (so it is not loaded for
+     everyone who lands on the page) with their name, email and phone filled in.
+     form_embed.js sizes the iframe to fit the calendar. */
+  function loadBooking(i) {
+    var box = $("[data-booking]");
+    if (!box || !BRAND.bookingUrl) { return; }
+    var q = new URLSearchParams();
+    if (i.name) { q.set("first_name", i.name); }
+    if (i.email) { q.set("email", i.email); }
+    if (i.phone) { q.set("phone", i.phone); }
+    var src = BRAND.bookingUrl + (BRAND.bookingUrl.indexOf("?") > -1 ? "&" : "?") + q.toString();
+    var frame = box.querySelector("iframe");
+    if (!frame) {
+      frame = document.createElement("iframe");
+      frame.id = BRAND.bookingId + "_calc";
+      frame.setAttribute("allow", "payment");
+      frame.setAttribute("scrolling", "no");
+      frame.setAttribute("title", "Book a 15-minute triage call");
+      frame.style.cssText = "width:100%;border:none;overflow:hidden;min-height:640px;";
+      box.appendChild(frame);
+    }
+    frame.src = src;
+    if (!document.querySelector('script[src*="msgsndr.com/js/form_embed.js"]')) {
+      var s = document.createElement("script");
+      s.src = "https://link.msgsndr.com/js/form_embed.js";
+      s.type = "text/javascript";
+      document.body.appendChild(s);
+    }
+  }
+
+  $$("[data-to-booking]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var t = document.getElementById("tn-booking");
+      if (t) { try { t.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) { t.scrollIntoView(); } }
+    });
+  });
+
   function runLoading(i, r) {
     $("[data-load-name]").textContent = i.name ? ", " + i.name : "";
     var items = $$("[data-checks] li");
@@ -908,9 +967,8 @@
 
     $('[data-r="ctaTitle"]').textContent = BRAND.ctaTitle;
     $('[data-r="ctaBody"]').textContent = BRAND.ctaBody;
-    var cta = $('[data-r="ctaBtn"]');
-    cta.textContent = BRAND.ctaLabel;
-    cta.setAttribute("href", BRAND.ctaUrl);
+    $('[data-r="ctaBtn"]').textContent = BRAND.ctaLabel;
+    loadBooking(i);
     $('[data-r="disclaimer"]').textContent = BRAND.disclaimer;
 
     show("results");

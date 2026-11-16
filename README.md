@@ -16,7 +16,7 @@ The settings are at the top of the `<script>` block in `index.html`.
 - **`WEBHOOK_URL`:** optional GHL Inbound Webhook URL to also send each lead to. Leave it empty to skip it.
 - **`REQUIRE_PHONE`:** Set to `false` to make phone optional.
 - **`LOGO_URL`:** Logo image URL. Leave it empty to show a text version of the logo.
-- **`BRAND.ctaUrl`:** Where the results CTA button links to.
+- **`BRAND.bookingUrl` / `bookingId`:** the GHL booking calendar shown at the bottom of the results (15-minute triage call), with the name, email and phone passed in.
 - **`BRAND`:** CTA copy, disclaimer and webhook source label.
 
 ## Webhook payload

@@ -12,7 +12,8 @@ A 7-step calorie and macro calculator for Kim Weston's The New You Movement. It'
 
 The settings are at the top of the `<script>` block in `index.html`.
 
-- **`WEBHOOK_URL`:** GHL Inbound Webhook URL. Leave it empty to send nothing.
+- **`DASHBOARD_URL` / `DASHBOARD_CLIENT`:** every submission is posted to the REPS dashboard (`/api/forms`) and lands in Kim Weston's Leads as a Quiz lead called "Calorie calculator", with the results attached.
+- **`WEBHOOK_URL`:** optional GHL Inbound Webhook URL to also send each lead to. Leave it empty to skip it.
 - **`REQUIRE_PHONE`:** Set to `false` to make phone optional.
 - **`LOGO_URL`:** Logo image URL. Leave it empty to show a text version of the logo.
 - **`BRAND.ctaUrl`:** Where the results CTA button links to.

@@ -497,9 +497,14 @@
      SETTINGS
      ============================================================ */
 
-  /* GHL Inbound Webhook URL. Automation > Workflows > new workflow >
-     trigger "Inbound Webhook" > copy URL > paste between the quotes.
-     Left empty, the calculator works and sends nothing. */
+  /* REPS dashboard: every submission lands in Kim Weston's Leads
+     as a new lead, with the calculator answers and results attached. */
+  var DASHBOARD_URL = "https://repshealthgrowth.com/api/forms";
+  var DASHBOARD_CLIENT = "kim-weston";
+
+  /* Optional: a GHL Inbound Webhook URL to also send each lead to.
+     Automation > Workflows > new workflow > trigger "Inbound Webhook"
+     > copy URL > paste between the quotes. Left empty, it is skipped. */
   var WEBHOOK_URL = "";
 
   /* Set to false to make phone optional. */
@@ -777,7 +782,43 @@
   }
 
   /* ---------- Lead delivery ---------- */
+  /* Form-encoded with sendBeacon: no CORS preflight, survives the page
+     moving on, and a failed send never blocks the visitor's results. */
+  function post(url, fields) {
+    try {
+      var body = new URLSearchParams();
+      Object.keys(fields).forEach(function (k) { body.append(k, String(fields[k])); });
+      if (navigator.sendBeacon && navigator.sendBeacon(url, body)) { return; }
+      fetch(url, { method: "POST", mode: "no-cors", keepalive: true,
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString()
+      })["catch"](function () {});
+    } catch (e) { /* never block the visitor on a failed send */ }
+  }
+
   function sendLead(i, r) {
+    if (DASHBOARD_URL) {
+      var q = new URLSearchParams(location.search);
+      var lead = {
+        client: DASHBOARD_CLIENT,
+        source: "quiz",
+        form: "Calorie calculator",
+        name: i.name, email: i.email, phone: i.phone,
+        page: location.pathname || "/",
+        utm_campaign: q.get("utm_campaign") || "",
+        "answers[Goal]": r.goal.label,
+        "answers[Daily calorie target]": r.target + " kcal",
+        "answers[Protein]": r.macros[0].grams + "g",
+        "answers[Carbs]": r.macros[1].grams + "g",
+        "answers[Fat]": r.macros[2].grams + "g",
+        "answers[Maintenance]": r.tdee + " kcal",
+        "answers[Resting rate]": r.bmr + " kcal",
+        "answers[Age]": i.age,
+        "answers[Height]": i.cm + " cm",
+        "answers[Weight]": i.kg + " kg",
+        "answers[Activity]": r.act.label
+      };
+      post(DASHBOARD_URL, lead);
+    }
     if (!WEBHOOK_URL) { return; }
     var payload = {
       first_name: i.name, email: i.email, phone: i.phone,
@@ -787,14 +828,7 @@
       protein_g: r.macros[0].grams, carbs_g: r.macros[1].grams, fat_g: r.macros[2].grams,
       source: BRAND.source
     };
-    try {
-      var body = new URLSearchParams();
-      Object.keys(payload).forEach(function (k) { body.append(k, String(payload[k])); });
-      if (navigator.sendBeacon && navigator.sendBeacon(WEBHOOK_URL, body)) { return; }
-      fetch(WEBHOOK_URL, { method: "POST", mode: "no-cors", keepalive: true,
-        headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString()
-      })["catch"](function () {});
-    } catch (e) { /* never block the visitor on a failed send */ }
+    post(WEBHOOK_URL, payload);
   }
 
   /* ---------- Screens ---------- */

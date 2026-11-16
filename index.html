@@ -1,16 +1,26 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<!-- Without this, phones show the page as a shrunk-down desktop page -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<title>Free Calorie Calculator | The New You Movement</title>
+<meta name="description" content="Answer 7 quick questions and get your personal daily calorie target plus your protein, carb, fat and fibre targets.">
 <!-- ============================================================
      THE NEW YOU MOVEMENT · CALORIE CALCULATOR
-     Paste this whole file into a Custom HTML / Custom Code element.
-     All styles are scoped under #tnym-calc so the site theme
-     cannot bleed in and this cannot bleed out.
-     Settings (webhook, CTA link, phone required) are at the top
-     of the <script> block.
+     Hosted as a standalone page. All styles are scoped under
+     #tnym-calc so it can also be pasted into a Custom HTML element.
+     Settings (dashboard, webhook, booking) are at the top of the
+     <script> block.
      ============================================================ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
 
 <style>
+html, body { margin: 0; padding: 0; background: #FFFFFF; }
+body { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: hidden; }
 #tnym-calc {
   --tn-rose: #C27D80;
   --tn-rose-deep: #A9666A;
@@ -272,24 +282,88 @@
 #tnym-calc .tn-foot { background: var(--tn-white); padding: 34px 16px; text-align: center; }
 
 @media (max-width: 640px) {
-  #tnym-calc .tn-hero { padding: 44px 16px 40px; }
-  #tnym-calc .tn-sub { font-size: 15px; }
-  #tnym-calc .tn-band-grid { grid-template-columns: 1fr; gap: 18px; }
-  #tnym-calc .tn-wrap { padding: 28px 16px 48px; }
-  #tnym-calc .tn-card { padding: 24px 18px 26px; }
-  #tnym-calc .tn-options.grid2 { grid-template-columns: 1fr; }
-  #tnym-calc .tn-step-btn { flex-basis: 40px; height: 40px; font-size: 20px; }
+  /* Compact header and hero, so the quiz starts near the top of the screen */
+  #tnym-calc .tn-top { padding: 14px 16px; }
+  #tnym-calc .tn-logo-circle { width: 54px; height: 54px; }
+  #tnym-calc .tn-logo-big { font-size: 24px; }
+  #tnym-calc .tn-logo-small { font-size: 11px; }
+  #tnym-calc .tn-logo-move { font-size: 4.6px; }
+  #tnym-calc .tn-logo img { height: 56px; }
+  #tnym-calc .tn-hero { padding: 26px 18px 24px; }
+  #tnym-calc .tn-eyebrow { font-size: 11px; letter-spacing: 0.16em; margin-bottom: 10px; }
+  #tnym-calc .tn-h1 { font-size: 25px; line-height: 1.22; letter-spacing: -0.01em; }
+  #tnym-calc .tn-sub { font-size: 14px; line-height: 1.55; margin-top: 12px; }
+
+  /* Stats stay on one row as a slim strip */
+  #tnym-calc .tn-band { padding: 14px 8px; }
+  #tnym-calc .tn-band-grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  #tnym-calc .tn-band-grid > div + div { border-left: 1px solid rgba(255,255,255,0.25); }
+  #tnym-calc .tn-band b { font-size: 19px; font-weight: 500; }
+  #tnym-calc .tn-band span { font-size: 10.5px; line-height: 1.3; margin-top: 2px; padding: 0 4px; }
+
+  /* Quiz card */
+  #tnym-calc .tn-wrap { padding: 16px 12px 36px; }
+  #tnym-calc .tn-card { padding: 20px 16px 22px; border-radius: 18px; }
+  #tnym-calc .tn-progress { margin-bottom: 20px; gap: 10px; }
+  #tnym-calc .tn-back { flex-basis: 34px; height: 34px; }
+  #tnym-calc .tn-count { min-width: 34px; font-size: 12px; }
+  #tnym-calc .tn-q-kicker { font-size: 11px; }
+  #tnym-calc .tn-q-title { font-size: 22px; margin-top: 6px; }
+  #tnym-calc .tn-q-help { font-size: 13.5px; margin-top: 6px; }
+  #tnym-calc .tn-q-body { margin-top: 20px; }
+  #tnym-calc .tn-input { height: 54px; font-size: 17px; }
+  #tnym-calc .tn-input.big { height: 58px; font-size: 19px; }
+  #tnym-calc .tn-actions { margin-top: 22px; }
+  #tnym-calc .tn-btn { padding: 17px 16px; font-size: 14.5px; }
+
+  /* Sliders: bigger number, bigger thumb for thumbs */
+  #tnym-calc .tn-readout { margin-bottom: 20px; }
+  #tnym-calc .tn-readout b { font-size: 58px; }
+  #tnym-calc .tn-step-btn { flex-basis: 44px; height: 44px; font-size: 22px; }
   #tnym-calc .tn-slider-row { gap: 10px; }
-  #tnym-calc .tn-ends { margin: 10px 50px 0; }
+  #tnym-calc .tn-range { height: 12px; }
+  #tnym-calc .tn-range::-webkit-slider-thumb { width: 34px; height: 34px; }
+  #tnym-calc .tn-ends { margin: 8px 54px 0; font-size: 12px; }
+  #tnym-calc .tn-units { margin-top: 18px; }
+
+  /* Answer cards: tighter so all options fit on screen */
+  #tnym-calc .tn-options { gap: 10px; }
+  #tnym-calc .tn-options.grid2 { grid-template-columns: 1fr; }
+  #tnym-calc .tn-opt { padding: 13px 14px; gap: 12px; border-radius: 12px; }
+  #tnym-calc .tn-opt:hover { transform: none; box-shadow: none; }
+  #tnym-calc .tn-ico { flex-basis: 40px; height: 40px; border-radius: 10px; }
+  #tnym-calc .tn-ico svg { width: 21px; height: 21px; }
+  #tnym-calc .tn-opt b { font-size: 14.5px; }
+  #tnym-calc .tn-opt span.d { font-size: 12.5px; line-height: 1.4; }
+  #tnym-calc .tn-tick { flex-basis: 22px; height: 22px; }
+
+  /* Results */
+  #tnym-calc .tn-h2 { font-size: 22px; margin-top: 12px; }
+  #tnym-calc .tn-target-num { font-size: 60px; }
+  #tnym-calc .tn-scale { margin: 22px 4px 6px; }
+  #tnym-calc .tn-mini { margin-top: 20px; }
+  #tnym-calc .tn-mini div { padding: 14px 6px; }
   #tnym-calc .tn-mini b { font-size: 18px; }
   #tnym-calc .tn-mini span { font-size: 11px; }
-  #tnym-calc .tn-loading { padding: 44px 20px; }
-  #tnym-calc .tn-closing { padding: 30px 20px; }
+  #tnym-calc .tn-gap { height: 14px; }
+  #tnym-calc .tn-macro-top b { font-size: 14.5px; }
+  #tnym-calc .tn-macro-top span { font-size: 12.5px; }
+  #tnym-calc .tn-notes li { font-size: 14px; }
+  #tnym-calc .tn-loading { padding: 40px 18px; }
+  #tnym-calc .tn-closing { padding: 28px 18px; border-radius: 18px; margin-top: 14px; }
+  #tnym-calc .tn-closing h3 { font-size: 21px; }
+  #tnym-calc .tn-closing p { font-size: 14px; margin: 10px auto 18px; }
+  #tnym-calc .tn-book { margin-top: 14px; padding-left: 10px; padding-right: 10px; }
+  #tnym-calc .tn-book .tn-sec, #tnym-calc .tn-book-sub { padding: 0 6px; }
+  #tnym-calc .tn-book-frame { margin: 0 -4px; }
+  #tnym-calc .tn-foot { padding: 24px 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
   #tnym-calc *, #tnym-calc *::before { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 </style>
+</head>
+<body>
 
 <div id="tnym-calc">
 
@@ -708,7 +782,7 @@
   buildOptions("goal", GOALS);
 
   /* ---------- Quiz navigation ---------- */
-  function goTo(i, dir) {
+  function goTo(i, dir, initial) {
     if (i < 0 || i >= STEPS.length) { return; }
     state.step = i;
     STEPS.forEach(function (s, idx) {
@@ -733,9 +807,23 @@
     next.classList.toggle("tn-hidden", isChoice && !state[key]);
     $("[data-note]").classList.toggle("tn-hidden", i !== 0 && !last);
 
-    if (key === "name") { setTimeout(function () { try { $("#tn-name").focus({ preventScroll: true }); } catch (e) {} }, 60); }
-    if (key === "contact") { setTimeout(function () { try { $("#tn-email").focus({ preventScroll: true }); } catch (e) {} }, 60); }
+    /* Keep the question in view: if the top of the card has scrolled off
+       screen (common on phones), bring it back so the new question is seen. */
+    if (!initial) {
+      var card = $('[data-screen="form"]');
+      var top = card.getBoundingClientRect().top;
+      if (top < 0 || top > window.innerHeight * 0.45) {
+        var y = top + window.pageYOffset - 12;
+        try { window.scrollTo({ top: y, behavior: "smooth" }); } catch (e) { window.scrollTo(0, y); }
+      }
+    }
+
+    /* Focus text fields, but not on first load: on a phone that would pop
+       the keyboard up before they have even seen the page. */
+    if (key === "name" && !initial) { setTimeout(function () { try { $("#tn-name").focus({ preventScroll: true }); } catch (e) {} }, 60); }
+    if (key === "contact" && !isTouch) { setTimeout(function () { try { $("#tn-email").focus({ preventScroll: true }); } catch (e) {} }, 60); }
   }
+  var isTouch = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
 
   function firstName() {
     var n = $("#tn-name").value.trim().split(/\s+/)[0] || "";
@@ -1016,9 +1104,11 @@
     ["age", "height", "weight"].forEach(function (k) { paint(k); });
     $$(".has-err").forEach(function (el) { el.classList.remove("has-err"); });
     show("form");
-    goTo(0, -1);
+    goTo(0, -1, true);
   });
 
-  goTo(0, 1);
+  goTo(0, 1, true);
 })();
 </script>
+</body>
+</html>

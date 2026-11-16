@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <!-- Without this, phones show the page as a shrunk-down desktop page -->
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- maximum-scale=1 stops iPhones zooming in when a field is tapped (people can still pinch to zoom) -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FFFFFF">
 <title>Free Calorie Calculator | The New You Movement</title>
 <meta name="description" content="Answer 7 quick questions and get your personal daily calorie target plus your protein, carb, fat and fibre targets.">
@@ -45,6 +46,8 @@ body { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: hidde
 }
 #tnym-calc *, #tnym-calc *::before, #tnym-calc *::after { box-sizing: border-box; margin: 0; }
 #tnym-calc button, #tnym-calc input { font-family: inherit; }
+/* iPhones zoom in on any field under 16px when it's tapped, so never go below that */
+#tnym-calc input, #tnym-calc select, #tnym-calc textarea { font-size: max(16px, 1em); }
 #tnym-calc .tn-hidden { display: none !important; }
 
 /* ---------- Header ---------- */

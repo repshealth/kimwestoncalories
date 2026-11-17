@@ -608,10 +608,9 @@ body { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: hidde
   var DASHBOARD_URL = "https://repshealthgrowth.com/api/forms";
   var DASHBOARD_CLIENT = "kim-weston";
 
-  /* Optional: a GHL Inbound Webhook URL to also send each lead to.
-     Automation > Workflows > new workflow > trigger "Inbound Webhook"
-     > copy URL > paste between the quotes. Left empty, it is skipped. */
-  var WEBHOOK_URL = "";
+  /* GHL Inbound Webhook (Kim's sub-account): each lead is also sent here.
+     The workflow creates/updates the contact and tags it. Set to "" to stop. */
+  var WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/ReulQhqq5hKOABEvGT7d/webhook-trigger/c711ba92-4044-434b-b5b7-5c19d21e48ad";
 
   /* Set to false to make phone optional. */
   var REQUIRE_PHONE = true;
@@ -954,7 +953,15 @@ body { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: hidde
       protein_g: r.macros[0].grams, carbs_g: r.macros[1].grams, fat_g: r.macros[2].grams, fibre_g: r.fibre,
       source: BRAND.source
     };
-    post(WEBHOOK_URL, payload);
+    /* GHL reads JSON best. If the browser blocks the JSON request (no
+       network or a cross-site block), fall back to the form-encoded beacon. */
+    try {
+      fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })["catch"](function () { post(WEBHOOK_URL, payload); });
+    } catch (e) { post(WEBHOOK_URL, payload); }
   }
 
   /* ---------- Screens ---------- */
